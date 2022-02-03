@@ -1,1 +1,1 @@
-web: npm startDeploy
+web: node dist/index.js
