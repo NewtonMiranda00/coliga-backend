@@ -1,5 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { Request } from '@interfaces/index';
+
+
 
 const Auth = async (req :Request, res :Response, next :NextFunction) => {
   try {
@@ -13,19 +16,20 @@ const Auth = async (req :Request, res :Response, next :NextFunction) => {
     if (parts.length !== 2)
       return res.status(401).send({ error: 'Token error' });
 
-    const [schema, token] = parts;
+    const [ schema, token ] = parts;
 
     if (!/^Bearer$/i.test(schema))
       return res.status(401).send({ error: 'Token malformatted.' });
 
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    jwt.verify(token, process.env.SECRET_KEY, (err, decoded: any) => {
+      if (err) return res
+        .status(401)
+        .send({ error: 'Token malformatted' });
 
-    if ((<any>decoded).id !== req.params.id)
-      return res.status(401).send({
-        error: 'This token does not match the requested user.',
-      });
+      req.userId = decoded.id;
 
-    return next();
+      return next();
+    });
   } catch (err) {
     return res.status(401).send({ error: 'Token invalid.' });
   }

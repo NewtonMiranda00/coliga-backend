@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import Auth from '@middlewares/auth';
+import UserController from '@controllers/UserController';
 
 const router = Router();
 
-router.use('/:id', [Auth]);
+router.use('/', [Auth]);
 
-router.get('/:id', (req, res) => res.send({ user: req.params.id, auth: true }));
+router.get('/', UserController.show);
 
 export default router;
